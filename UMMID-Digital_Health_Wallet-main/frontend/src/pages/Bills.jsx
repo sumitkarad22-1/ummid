@@ -129,7 +129,7 @@ const Bills = () => {
                                                 {b.filePath ? (
                                                     <div style={{ display: 'flex', gap: '5px' }}>
                                                         <a
-                                                            href={`/uploads/${b.filePath}`}
+                                                            href={b.filePath.startsWith('http') ? b.filePath : `/uploads/${b.filePath}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="btn btn-primary"
@@ -138,7 +138,7 @@ const Bills = () => {
                                                             View
                                                         </a>
                                                         <a
-                                                            href={`/uploads/${b.filePath}`}
+                                                            href={b.filePath.startsWith('http') ? b.filePath : `/uploads/${b.filePath}`}
                                                             download
                                                             className="btn btn-secondary"
                                                             style={{ padding: '5px 10px', fontSize: '0.8rem', textDecoration: 'none', background: '#6c757d', color: '#fff' }}

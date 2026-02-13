@@ -77,7 +77,7 @@ exports.getBills = async (req, res) => {
 
 exports.addBill = async (req, res) => {
     try {
-        const filePath = req.file ? req.file.filename : null;
+        const filePath = req.file ? req.file.path : null;
         if (!global.dbConnected) {
             const newBill = { _id: Date.now().toString(), ...req.body, userId: req.user.id, filePath };
             mockBills.push(newBill);
@@ -105,7 +105,7 @@ exports.getReports = async (req, res) => {
 
 exports.addReport = async (req, res) => {
     try {
-        const filePath = req.file ? req.file.filename : null;
+        const filePath = req.file ? req.file.path : null;
         // Ensure reportType is present if it's required by schema, might need to parse body if it is multipart
         if (!global.dbConnected) {
             const newReport = { _id: Date.now().toString(), ...req.body, userId: req.user.id, filePath };

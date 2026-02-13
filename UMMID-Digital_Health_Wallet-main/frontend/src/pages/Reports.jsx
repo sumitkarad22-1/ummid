@@ -104,7 +104,7 @@ const Reports = () => {
                                     <p style={{ fontSize: '0.8rem', color: '#666' }}>{r.filePath}</p>
                                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '10px' }}>
                                         <a
-                                            href={`/uploads/${r.filePath}`}
+                                            href={r.filePath.startsWith('http') ? r.filePath : `/uploads/${r.filePath}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="btn btn-primary"
@@ -113,7 +113,7 @@ const Reports = () => {
                                             View
                                         </a>
                                         <a
-                                            href={`/uploads/${r.filePath}`}
+                                            href={r.filePath.startsWith('http') ? r.filePath : `/uploads/${r.filePath}`}
                                             download
                                             className="btn btn-secondary"
                                             style={{ fontSize: '0.8rem', textDecoration: 'none', background: '#6c757d' }}

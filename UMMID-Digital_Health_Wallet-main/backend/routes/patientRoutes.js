@@ -6,22 +6,7 @@ const multer = require('multer');
 const path = require('path');
 
 // Configure Multer for File Uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, '../uploads');
-        if (!require('fs').existsSync(uploadPath)) {
-            require('fs').mkdirSync(uploadPath, { recursive: true });
-        }
-        console.log(`Saving file to: ${uploadPath}`);
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        const sanitizedName = file.originalname.replace(/\s+/g, '_');
-        const fileName = `${Date.now()}-${sanitizedName}`;
-        console.log(`Generated filename: ${fileName}`);
-        cb(null, fileName);
-    }
-});
+const { storage } = require('../config/cloudinary');
 
 const upload = multer({ storage: storage });
 
