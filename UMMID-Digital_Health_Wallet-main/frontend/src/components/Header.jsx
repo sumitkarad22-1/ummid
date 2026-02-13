@@ -15,6 +15,7 @@ const Header = () => {
             <div className="container header-content">
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <img src="/logo.jpg" alt="Logo" style={{ height: '40px', width: 'auto' }} />
+                    <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#000' }}>UMMID</span>
 
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>

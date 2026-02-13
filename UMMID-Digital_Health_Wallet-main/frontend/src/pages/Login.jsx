@@ -17,7 +17,7 @@ const Login = () => {
         try {
             const res = await axios.post('/api/auth/send-otp', { email });
             if (res.data.otp) {
-                alert(`DEMO MODE OTP: ${res.data.otp}`);
+                alert(`YOUR OTP IS: ${res.data.otp}`);
             }
             setStep(2);
         } catch (err) {

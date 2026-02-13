@@ -7,6 +7,7 @@ const Bills = () => {
     const [newBill, setNewBill] = useState({
         hospitalName: '', date: new Date().toISOString().split('T')[0], amount: '', paymentStatus: 'Paid'
     });
+    const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const token = localStorage.getItem('token');
@@ -30,9 +31,19 @@ const Bills = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('hospitalName', newBill.hospitalName);
+        formData.append('date', newBill.date);
+        formData.append('amount', newBill.amount);
+        formData.append('paymentStatus', newBill.paymentStatus);
+        if (file) formData.append('file', file);
+
         try {
-            await axios.post('/api/patient/bills', newBill, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.post('/api/patient/bills', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
             });
             setShowForm(false);
             fetchBills();
@@ -74,6 +85,10 @@ const Bills = () => {
                                     <option>Pending</option>
                                 </select>
                             </div>
+                            <div className="form-group">
+                                <label>Upload Bill</label>
+                                <input type="file" className="form-control" onChange={e => setFile(e.target.files[0])} />
+                            </div>
                             <button type="submit" className="btn btn-primary">Save Bill</button>
                         </form>
                     </div>
@@ -111,7 +126,27 @@ const Bills = () => {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button className="btn btn-primary" style={{ padding: '5px 10px', fontSize: '0.8rem' }}>Download</button>
+                                                {b.filePath ? (
+                                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                                        <a
+                                                            href={`/uploads/${b.filePath}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="btn btn-primary"
+                                                            style={{ padding: '5px 10px', fontSize: '0.8rem', textDecoration: 'none' }}
+                                                        >
+                                                            View
+                                                        </a>
+                                                        <a
+                                                            href={`/uploads/${b.filePath}`}
+                                                            download
+                                                            className="btn btn-secondary"
+                                                            style={{ padding: '5px 10px', fontSize: '0.8rem', textDecoration: 'none', background: '#6c757d', color: '#fff' }}
+                                                        >
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                ) : <span>No File</span>}
                                             </td>
                                         </tr>
                                     ))}

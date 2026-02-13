@@ -5,8 +5,9 @@ import Header from '../components/Header';
 const Reports = () => {
     const [reports, setReports] = useState([]);
     const [newReport, setNewReport] = useState({
-        reportType: '', date: new Date().toISOString().split('T')[0], filePath: ''
+        reportType: '', date: new Date().toISOString().split('T')[0]
     });
+    const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const token = localStorage.getItem('token');
@@ -29,19 +30,22 @@ const Reports = () => {
     }, []);
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // In a real app, upload to server here and get URL.
-            // For demo, we just store the name.
-            setNewReport({ ...newReport, filePath: file.name });
-        }
+        setFile(e.target.files[0]);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('reportType', newReport.reportType);
+        formData.append('date', newReport.date);
+        if (file) formData.append('file', file);
+
         try {
-            await axios.post('/api/patient/reports', newReport, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.post('/api/patient/reports', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
             });
             setShowForm(false);
             fetchReports();
@@ -98,7 +102,25 @@ const Reports = () => {
                                     <h4>{r.reportType}</h4>
                                     <p className="text-muted">{new Date(r.date).toLocaleDateString()}</p>
                                     <p style={{ fontSize: '0.8rem', color: '#666' }}>{r.filePath}</p>
-                                    <button className="btn btn-primary" style={{ marginTop: '10px', fontSize: '0.8rem' }}>View / Download</button>
+                                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '10px' }}>
+                                        <a
+                                            href={`/uploads/${r.filePath}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="btn btn-primary"
+                                            style={{ fontSize: '0.8rem', textDecoration: 'none' }}
+                                        >
+                                            View
+                                        </a>
+                                        <a
+                                            href={`/uploads/${r.filePath}`}
+                                            download
+                                            className="btn btn-secondary"
+                                            style={{ fontSize: '0.8rem', textDecoration: 'none', background: '#6c757d' }}
+                                        >
+                                            Download
+                                        </a>
+                                    </div>
                                 </div>
                             ))}
                         </div>

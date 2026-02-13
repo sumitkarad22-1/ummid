@@ -77,12 +77,13 @@ exports.getBills = async (req, res) => {
 
 exports.addBill = async (req, res) => {
     try {
+        const filePath = req.file ? req.file.filename : null;
         if (!global.dbConnected) {
-            const newBill = { _id: Date.now().toString(), ...req.body, userId: req.user.id };
+            const newBill = { _id: Date.now().toString(), ...req.body, userId: req.user.id, filePath };
             mockBills.push(newBill);
             return res.status(201).json(newBill);
         }
-        const bill = new Bill({ ...req.body, userId: req.user.id });
+        const bill = new Bill({ ...req.body, userId: req.user.id, filePath });
         await bill.save();
         res.status(201).json(bill);
     } catch (e) {
@@ -104,12 +105,14 @@ exports.getReports = async (req, res) => {
 
 exports.addReport = async (req, res) => {
     try {
+        const filePath = req.file ? req.file.filename : null;
+        // Ensure reportType is present if it's required by schema, might need to parse body if it is multipart
         if (!global.dbConnected) {
-            const newReport = { _id: Date.now().toString(), ...req.body, userId: req.user.id };
+            const newReport = { _id: Date.now().toString(), ...req.body, userId: req.user.id, filePath };
             mockReports.push(newReport);
             return res.status(201).json(newReport);
         }
-        const report = new Report({ ...req.body, userId: req.user.id });
+        const report = new Report({ ...req.body, userId: req.user.id, filePath });
         await report.save();
         res.status(201).json(report);
     } catch (e) {
