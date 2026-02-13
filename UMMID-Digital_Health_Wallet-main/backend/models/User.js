@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     zipCode: { type: String, required: true },
     otp: { type: String }, // For OTP storage during login
     otpExpires: { type: Date }, // For OTP expiration
+    password: { type: String, required: true },
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);

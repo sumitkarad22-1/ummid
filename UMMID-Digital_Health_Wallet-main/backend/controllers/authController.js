@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -17,7 +18,7 @@ let mockUsers = [];
 
 exports.register = async (req, res) => {
     try {
-        const { firstName, lastName, mobile, email, address, zipCode } = req.body;
+        const { firstName, lastName, mobile, email, address, zipCode, password } = req.body;
 
         if (global.dbConnected === false) {
             const existing = mockUsers.find(u => u.email === email || u.mobile === mobile);
@@ -25,7 +26,7 @@ exports.register = async (req, res) => {
 
             const newUser = {
                 _id: Date.now().toString(),
-                firstName, lastName, mobile, email, address, zipCode
+                firstName, lastName, mobile, email, address, zipCode, password
             };
             mockUsers.push(newUser);
             return res.status(201).json({ message: 'User registered successfully (Demo Mode)' });
@@ -34,7 +35,18 @@ exports.register = async (req, res) => {
         let user = await User.findOne({ $or: [{ email }, { mobile }] });
         if (user) return res.status(400).json({ message: 'User already exists' });
 
-        user = new User({ firstName, lastName, mobile, email, address, zipCode });
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        user = new User({
+            firstName,
+            lastName,
+            mobile,
+            email,
+            address,
+            zipCode,
+            password: hashedPassword
+        });
         await user.save();
 
         res.status(201).json({ message: 'User registered successfully' });
@@ -43,74 +55,22 @@ exports.register = async (req, res) => {
     }
 };
 
-exports.sendOTP = async (req, res) => {
+exports.login = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, password } = req.body;
 
         let user;
         if (global.dbConnected === false) {
             user = mockUsers.find(u => u.email === email);
-        } else {
-            user = await User.findOne({ email });
-        }
-
-        if (!user) return res.status(404).json({ message: 'User not found' });
-
-        const otp = generateOTP();
-        const otpExpires = Date.now() + 10 * 60 * 1000;
-
-        if (global.dbConnected === false) {
-            user.otp = otp;
-            user.otpExpires = otpExpires;
-        } else {
-            user.otp = otp;
-            user.otpExpires = otpExpires;
-            await user.save();
-        }
-
-        console.log(`Sending OTP to ${email}`);
-
-        try {
-            if (process.env.EMAIL_USER !== 'your-email@gmail.com') {
-                await transporter.sendMail({
-                    from: process.env.EMAIL_USER,
-                    to: email,
-                    subject: 'Your UMMID Login OTP',
-                    text: `Your OTP is ${otp}`
-                });
+            if (!user || user.password !== password) {
+                return res.status(400).json({ message: 'Invalid credentials' });
             }
-        } catch (emailError) {
-            console.error("Email sending failed:", emailError);
-        }
-
-        res.json({ message: 'OTP sent successfully. Please check your email.' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-exports.verifyOTP = async (req, res) => {
-    try {
-        const { email, otp } = req.body;
-
-        let user;
-        if (global.dbConnected === false) {
-            user = mockUsers.find(u => u.email === email);
         } else {
             user = await User.findOne({ email });
-        }
+            if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-        if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
-            return res.status(400).json({ message: 'Invalid or expired OTP' });
-        }
-
-        if (global.dbConnected === false) {
-            user.otp = undefined;
-            user.otpExpires = undefined;
-        } else {
-            user.otp = undefined;
-            user.otpExpires = undefined;
-            await user.save();
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });

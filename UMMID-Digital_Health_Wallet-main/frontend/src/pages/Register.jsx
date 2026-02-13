@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
     const [formData, setFormData] = useState({
-        firstName: '', lastName: '', mobile: '', email: '', address: '', zipCode: ''
+        firstName: '', lastName: '', mobile: '', email: '', address: '', zipCode: '', password: '', confirmPassword: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -18,6 +18,13 @@ const Register = () => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match");
+            setLoading(false);
+            return;
+        }
+
         try {
             await axios.post('/api/auth/register', formData);
             alert('Registration Successful! Please Login.');
@@ -57,6 +64,17 @@ const Register = () => {
                         <div className="form-group">
                             <label>Email ID</label>
                             <input type="email" name="email" className="form-control" onChange={handleChange} required />
+                        </div>
+                    </div>
+
+                    <div className="grid-2-col">
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" className="form-control" onChange={handleChange} required minLength="6" />
+                        </div>
+                        <div className="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" name="confirmPassword" className="form-control" onChange={handleChange} required minLength="6" />
                         </div>
                     </div>
 
