@@ -47,19 +47,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/patient', patientRoutes);
 
 // Serve Frontend in Production
-if (process.env.NODE_ENV === 'production') {
-    // Serve static files from the React app
-    app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-    // Handle React routing, return all requests to React app
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-    });
-} else {
-    app.get('/', (req, res) => {
-        res.send('API is running...');
-    });
-}
+app.get('/', (req, res) => {
+    res.send('API is running...');
+});
 
 const server = app.listen(PORT, console.log(`Server running on port ${PORT}`));
 
