@@ -68,7 +68,7 @@ exports.sendOTP = async (req, res) => {
             await user.save();
         }
 
-        console.log(`DEMO MODE: OTP for ${email} is ${otp}`);
+        console.log(`Sending OTP to ${email}`);
 
         try {
             if (process.env.EMAIL_USER !== 'your-email@gmail.com') {
@@ -80,10 +80,10 @@ exports.sendOTP = async (req, res) => {
                 });
             }
         } catch (emailError) {
-            // Ignore email error in demo
+            console.error("Email sending failed:", emailError);
         }
 
-        res.json({ message: 'OTP sent successfully (Demo Mode)', otp: otp });
+        res.json({ message: 'OTP sent successfully. Please check your email.' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

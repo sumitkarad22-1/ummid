@@ -8,8 +8,8 @@ export default defineConfig({
         host: true,
         port: 5173,
         proxy: {
-            '/api': 'https://ummid-backend.onrender.com',
-            '/uploads': 'https://ummid-backend.onrender.com'
+            '/api': 'http://localhost:5000',
+            '/uploads': 'http://localhost:5000'
         }
     }
 })

@@ -16,9 +16,7 @@ const Login = () => {
         setError('');
         try {
             const res = await axios.post('/api/auth/send-otp', { email });
-            if (res.data.otp) {
-                alert(`YOUR OTP IS: ${res.data.otp}`);
-            }
+            // Alert removed as OTP is sent to email
             setStep(2);
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send OTP');
@@ -82,7 +80,7 @@ const Login = () => {
                                 required
                             />
                             <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
-                                (Check backend console for OTP in Demo Mode)
+                                (Please check your email for OTP)
                             </small>
                         </div>
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
